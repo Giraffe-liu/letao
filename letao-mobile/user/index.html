@@ -25,7 +25,7 @@
                 <a class="mui-navigate-right" href="#account">
                     <img class="mui-media-object mui-pull-left head-img" id="head-img" src="../images/user.jpg">
                     <div class="mui-media-body">
-                        Hello MUI
+                        <span class="uname"></span>
                         <p class="mui-ellipsis">账号:hellomui</p>
                     </div>
                 </a>
@@ -43,7 +43,7 @@
             </li>
         </ul>
         <div class="p20">
-            <a href="login.html" class="mui-btn btn_outLogin">退出登录</a>
+            <a href="javascript:;" class="mui-btn btn_outLogin">退出登录</a>
         </div>
     </div>
     <footer class="cz_tabs">
@@ -54,5 +54,34 @@
     </footer>
 </div>
 <script src="../res/mui/js/mui.min.js"></script>
+<script src="../js/jquery.min.js"></script>
+<script>
+    //退出登录按钮
+    $('.btn_outLogin').on('click',function(){
+        $.ajax({
+            url:'/api/user/logout',
+            type:'get',
+            success:function(msg){
+                console.log(msg);
+                if(msg.success){
+                    location.href="/letao-mobile";
+                }
+            }
+        })
+    })
+    //检测用户是否登录
+    $.ajax({
+        url:'/api/user/queryUserMessage',
+        type:'get',
+        success:function(info){
+            console.log(info.username);
+            //显示用户信息
+            $('span.uname').text(info.username);
+            if(info.error){
+                location.href='./login.html'
+            }
+        }
+    })
+</script>
 </body>
 </html>

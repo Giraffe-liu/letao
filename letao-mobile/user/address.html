@@ -21,34 +21,12 @@
     </header>
     <div class="cz_container">
         <ul class="mui-table-view">
-            <li class="mui-table-view-cell">
-                <div class="mui-slider-right mui-disabled">
-                    <a class="mui-btn mui-btn-red">删除</a>
-                </div>
-                <a href="addressManage.html" class="mui-navigate-right mui-slider-handle">
-                    <div class="delivery">邮编：<span>100000</span>&nbsp;收货人：<span>黄晓明</span></div>
-                    <div class="address">北京市海淀区西三旗街道经验龙办公楼传智播客教育科技有限公司</div>
-                </a>
-            </li>
-            <li class="mui-table-view-cell">
-                <div class="mui-slider-right mui-disabled">
-                    <a class="mui-btn mui-btn-red">删除</a>
-                </div>
-                <a href="addressManage.html" class="mui-navigate-right mui-slider-handle">
-                    <div class="delivery">邮编：<span>100000</span>&nbsp;收货人：<span>黄晓明</span></div>
-                    <div class="address">北京市海淀区西三旗街道经验龙办公楼传智播客教育科技有限公司</div>
-                </a>
-            </li>
-            <li class="mui-table-view-cell">
-                <div class="mui-slider-right mui-disabled">
-                    <a class="mui-btn mui-btn-red">删除</a>
-                </div>
-                <a href="addressManage.html" class="mui-navigate-right mui-slider-handle">
-                    <div class="delivery">邮编：<span>100000</span>&nbsp;收货人：<span>黄晓明</span></div>
-                    <div class="address">北京市海淀区西三旗街道经验龙办公楼传智播客教育科技有限公司</div>
-                </a>
-            </li>
+            
         </ul>
+        <div style="padding:0px 10px">
+            <button class="mui-btn mui-btn-primary btn_login btn_edit">新增收货地址</button>
+        </div>
+        
     </div>
     <footer class="cz_tabs">
         <a class="tab_home fa fa-home" href="../index.html"><span>首页</span></a>
@@ -58,5 +36,35 @@
     </footer>
 </div>
 <script src="../res/mui/js/mui.min.js"></script>
+<script src="../js/jquery.min.js"></script>
+<script src="../js/template-web.js"></script>
+<script type="text/template" id='tpl'>
+    {{each list val}}
+    <li class="mui-table-view-cell">
+        <div class="mui-slider-right mui-disabled">
+            <a class="mui-btn mui-btn-red">删除</a>
+        </div>
+        <a href="addressManage.html" class="mui-navigate-right mui-slider-handle">
+            <div class="delivery">邮编：<span>{{val.postCode}}</span>&nbsp;收货人：<span>{{val.recipients}}</span></div>
+            <div class="address">{{val.addressDetail}}</div>
+        </a>
+    </li>
+    {{/each}}
+</script>
+<script>
+    $('.btn_edit').on('click',function(){
+        location.href='./addressAdd.html';
+    })
+    //发送请求，加载页面
+    $.ajax({
+        url:'/api/address/queryAddress',
+        success:function(msg){
+            console.log(msg);
+            //初始化模板引擎
+            var html = template('tpl',{list:msg});
+            $('ul').html(html);
+        }
+    })
+</script>
 </body>
 </html>
