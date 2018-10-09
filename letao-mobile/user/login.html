@@ -44,6 +44,25 @@
 <script src="../res/mui/js/mui.min.js"></script>
 <script src="../../assets/jquery/jquery.min.js"></script>
 <script>
+    //获取地址栏的参数
+    // var search = location.search.slice(1).split('?');
+    // var o = {};
+    // for(var i = 0;i<search.length;i++){
+    //     var arr =  search[i].split('=')
+    //     o[arr[0]] = arr[1];
+    // }
+
+     // 地址参数
+    var search = location.search.slice(1);
+
+    var reg = /url=(.+)/;
+
+    // console.log(reg.exec(search))
+    var match = reg.exec(search);
+    // 获取地址上的 url
+    var url = match && match[1];
+
+    //登录按钮
     var $button = $(".btn_login");
     $button.click(function(){
         if($(".name").val()=="" || $(".pwd").val() == ""){
@@ -57,11 +76,12 @@
                 password:$(".pwd").val(),
             },
             success:function(msg){
-                console.log(msg);
-                window.location.href="./index.html";
-            },
-            error:function(err){
-                console.log(err);
+                // console.log(msg);
+                if(msg.success){
+                    if(url) return  window.location.href = url;
+                    location.href="./index.html";
+                }
+                
             }
         })
     })

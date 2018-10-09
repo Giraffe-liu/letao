@@ -12,6 +12,11 @@
     <link rel="stylesheet" href="res/fontAwesome/css/font-awesome.min.css"/>
     <link rel="stylesheet" href="css/common.css"/>
     <link rel="stylesheet" href="css/product.css"/>
+    <style>
+        .p_active{
+            background: pink;
+        }
+    </style>
 </head>
 <body>
 <div class="cz_layout">
@@ -65,14 +70,15 @@
     </div>
     <div class="p_size">
         尺码：
-        {{each sizes as val}}
+        {{each size as val}}
         <span class="btn_size">{{val}}</span>
         {{/each}}
     </div>
     <div class="p_number">
         数量：
-        <span class="jian">-</span><input type="tel"/><span class="jia">+</span>
-        剩余：{{num}} 件
+        <span class="jian btn_num">-</span><input class="input_num" type="tel" value='1'/><span class="jia btn_num">+</span>
+       剩余:<span class="p_span">{{num}}</span> 件
+        
     </div>
     <div class="p_detail">
         <img data-lazyload="images/detail.jpg"  alt=""/>
@@ -84,6 +90,7 @@
     </div>   
 </script>
 <script>
+    
     //根据地址栏获取id值，发送ajax请求，获得数据，渲染页面
     var search = location.search.slice(1);
     var arr = search.split('=');
@@ -100,38 +107,73 @@
         success:function(msg){
             console.log(msg);
             msg.discount = (msg.price/ msg.oldPrice*10).toFixed(1);
-            msg.sizes = msg.size.split('-');
+            msg.size = msg.size.split('-');
             var html = template('tpl',msg);
             $('#Pdetial').html(html);
+
+            //模板加载完成后再进行滚动
+            mui('.mui-slider').slider({
+                interval: 3000 //自动轮播周期，若为0则不自动播放，默认为0；
+            });
+            mui('.mui-scroll-wrapper').scroll({
+                scrollY: true, //是否竖向滚动
+                scrollX: false, //是否横向滚动
+                startX: 0, //初始化时滚动至x
+                startY: 0, //初始化时滚动至y
+                indicators: false, //是否显示滚动条
+                deceleration: 0.0006, //阻尼系数,系数越小滑动越灵敏
+                bounce: true, //是否启用回弹
+            });
         }
     })
 
-    mui(function(){
-        mui('.mui-slider').slider({
-            interval:3000 //自动轮播周期，若为0则不自动播放，默认为0；
-        });
-        mui('.mui-scroll-wrapper').scroll({
-            scrollY: true, //是否竖向滚动
-            scrollX: false, //是否横向滚动
-            startX: 0, //初始化时滚动至x
-            startY: 0, //初始化时滚动至y
-            indicators: false, //是否显示滚动条
-            deceleration:0.0006, //阻尼系数,系数越小滑动越灵敏
-            bounce: true, //是否启用回弹
-        });
-        mui.init({
-            pullRefresh: {
-                container: '.mui-scroll-wrapper',
-                down: {
-                    callback: function(){
-                        setTimeout(function(){
-                            mui('.mui-scroll-wrapper').pullRefresh().endPulldownToRefresh(); //refresh completed
-                        },1000);
-                    }
+     //尺寸选中，使用事件代理，因为页面中的内容是动态添加的
+    $('#Pdetial').on('click', '.btn_size', function () {
+        $(this).addClass('p_active').siblings().removeClass('p_active');
+    })
+
+    //添加数量设置,
+    $('#Pdetial').on('click', '.btn_num', function () {
+        var input = $(this).siblings('input');
+        var n = input.val()-0;
+        if ($(this).is('.jia')) {
+            //判断临界值
+            if (n >= $('.p_span').text()) return;
+            input.val(++n);
+            return
+        }
+        if (n <= 1) return;
+        input.val(--n);
+    })
+
+
+    //加入购物车
+    $('.btn_addCart').on('click', function () {
+        // 获取变量
+        var numInput = $('.input_num').val().trim()-0;
+        var size = $('.p_active').text().trim();
+        //验证
+        if(!size) return mui.alert('必须选择一个型号');
+        if(numInput <1 || numInput >$('.p_span').text()) return mui.alert('请正确填写数量');
+        
+        //发送ajax请求
+        $.ajax({
+            url: '/api/cart/addCart',
+            type: 'post',
+            data: {
+                productId: o.pid,//产品id
+                num: numInput,
+                size: size
+            },
+            success: function (msg) {
+                if (msg.error) {
+                    mui.alert(msg.message);
+                    return location.href = "/letao-mobile/user/login.html?url=" + location.href;
                 }
+                location.href = './cart.html';
             }
-        });
-    });
+        })
+    })
 </script>
 
 </body>
