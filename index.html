@@ -82,7 +82,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="javascript:;">
+                            <a href='javascript:;' class='login_out'>
                                 <i class="fa fa-sign-out"></i>
                                 退出
                             </a>
@@ -140,7 +140,16 @@
     <script src="./assets/echarts/echarts.min.js"></script>
     <script src="./js/common.js"></script>
     <script>
-
+        //退出登录
+        $('.login_out').on('click',function(){
+            $.ajax({
+                url:'/api/employee/employeeLogout',
+                success:function(msg){
+                    location.href='./login.html'
+                }
+            })
+            return false;
+        })
         // 基于准备好的dom，初始化echarts实例
         var myChart = echarts.init(document.getElementById('main'));
 
